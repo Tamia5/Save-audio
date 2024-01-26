@@ -14,8 +14,8 @@ const createZipArchive = async () => {
 
   console.log(`Zip archive created: ${zipFilename}`);
 
-  //   await fse.remove(downloadDir);
-  //   console.log(`Download directory deleted: ${downloadDir}`);
+  await fse.remove(downloadDir);
+  console.log(`Download directory deleted: ${downloadDir}`);
 };
 
 export default createZipArchive;
