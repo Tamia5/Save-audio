@@ -24,6 +24,7 @@ const downloadAudio = async (dataUrl, category, index) => {
     console.log(`Download: ${audioFilename}`);
   } catch (error) {
     console.error("Error downloading audio files");
+    console.error(error.stack);
   }
 };
 
@@ -31,22 +32,19 @@ const main = async () => {
   try {
     const response = await axios.get(dataUrl);
     const audioTags = response.data.match(
-      /<audio.*?src="(https:\/\/dszentrum\.com\.ua\/wp-content\/uploads\/audio\/[^"]+)"/g
+      /<audio.*?src="https:\/\/dszentrum\.com\.ua\/wp-content\/uploads\/audio\/([^\/]+)\/([^"]+)"/g
     );
 
     const categoryCounters = {};
 
-    for (let index = 0; index < audioTags.length; index++) {
-      const audioTag = audioTags[index];
-      const audioUrl = audioTag.match(
-        /src="(https:\/\/dszentrum\.com\.ua\/wp-content\/uploads\/audio\/[^"]+)"/
-      )[1];
-
-      const parts = audioUrl.split("/");
-      const category = parts[parts.indexOf("audio") + 1];
+    for (const audioTag of audioTags) {
+      const [, category, fileName] = audioTag.match(
+        /<audio.*?src="https:\/\/dszentrum\.com\.ua\/wp-content\/uploads\/audio\/([^\/]+)\/([^"]+)"/
+      );
 
       categoryCounters[category] = categoryCounters[category] || 1;
 
+      const audioUrl = `https://dszentrum.com.ua/wp-content/uploads/audio/${category}/${fileName}`;
       await downloadAudio(audioUrl, category, categoryCounters[category]);
       categoryCounters[category]++;
     }
